@@ -4,14 +4,9 @@ Browser MVP for composing and publishing a sequence of posts to a MeshCore room-
 
 ## Install and launch
 
-Requires Node.js 18+ and npm. From a terminal in the cloned repository:
+The installer checks for **Node.js 18+ and npm**. If they are missing or too old, it attempts to install them using apt (Debian/Ubuntu), dnf (Fedora/RHEL-family), pacman (Arch), or Homebrew (macOS); Linux installation may request administrator access through `sudo`. It then runs `npm ci` and builds the browser bundle. On Windows, install Node.js 18+ with `winget install OpenJS.NodeJS.LTS` (or from nodejs.org), then run the project from WSL or a Bash environment.
 
-```sh
-chmod +x install.sh
-./install.sh
-```
-
-The installer installs the locked dependencies and starts the app listening on all network interfaces. Open the **Network URL** printed at startup (for example `http://192.168.1.225:8000/`) from another device on the same LAN. Open `http://127.0.0.1:8000/` on the host itself. Use a Chromium-based browser; browser USB/Bluetooth APIs work on localhost or HTTPS. Stop with Ctrl+C.
+The machine hosting the server does not need a desktop browser. Open the **Network URL** printed at startup (for example `http://192.168.1.225:8000/`) from another device on the same LAN. Use a Chromium-based browser. **Viewing the page over plain HTTP on a LAN IP is fine, but Web Serial/Bluetooth generally require a secure context (localhost or HTTPS)**; to use a radio attached to the client device remotely, serve the page over HTTPS. If the radio is attached to the host, open `http://localhost:8000/` in a Chromium browser on that host. Stop the server with Ctrl+C.
 
 Optional bind settings:
 
