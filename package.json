@@ -1,0 +1,13 @@
+{
+  "name": "meshpagepub",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@liamcottle/meshcore.js": "^1.15.0"
+  }
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MeshPage Publisher</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="shell">
+  <header><div><p class="eyebrow">MESHCORE · ROOM TOOL</p><h1>MeshPage Publisher</h1><p class="muted">Build a message sequence, then publish it in order.</p></div><span id="connectionBadge" class="badge">Disconnected</span></header>
+  <section class="panel connection"><div class="section-title"><div><h2>Radio connection</h2><p class="muted">USB serial or compatible Bluetooth UART</p></div></div><div class="actions"><button id="usbButton" class="secondary">Connect USB</button><button id="bluetoothButton" class="secondary">Connect Bluetooth</button><button id="disconnectButton" class="quiet" disabled>Disconnect</button></div><p id="connectionStatus" class="status" aria-live="polite">No radio connected.</p></section>
+  <section class="panel"><div class="section-title"><div><h2>Room server and queue</h2><p class="muted">Authenticate to the room-server node, then send posts sequentially.</p></div><div class="actions"><button id="addButton" class="secondary">+ Add message</button></div></div>
+    <label class="field">Room server on this radio<select id="roomServerSelect"><option value="">Connect a radio to load room servers…</option></select></label>
+    <button id="refreshServersButton" class="quiet" disabled>Refresh room servers</button>
+    <p id="serverListStatus" class="status" aria-live="polite">Room server list comes from the radio's saved contacts.</p>
+    <details><summary>Enter public key manually</summary><label class="field">Room-server public key<input id="roomInput" placeholder="64-character hex public key"></label></details>
+    <label class="field">Room password<input id="roomPassword" type="password" maxlength="15" autocomplete="off" placeholder="Room guest/write password"></label>
+    <div class="actions"><button id="loginButton" class="secondary" disabled>Log in to room server</button><span id="loginStatus" class="status" aria-live="polite">Connect a radio first.</span></div>
+    <div id="messages" class="messages"></div>
+    <div class="queue-controls"><label class="field delay">Delay between messages (ms)<input id="delayInput" type="number" min="250" step="250" value="1500"></label><div class="actions"><button id="stopButton" class="danger" disabled>Stop queue</button><button id="sendButton" class="primary">Publish sequence</button></div></div>
+    <div class="progress-track"><div id="progressBar"></div></div><p id="sendStatus" class="status" aria-live="polite">Ready.</p>
+  </section>
+  <section class="panel"><div class="section-title"><div><h2>Saved lists</h2><p class="muted">Stored in this browser on this device.</p></div></div><div class="save-row"><input id="listName" aria-label="List name" placeholder="List name"><button id="saveButton" class="secondary">Save current list</button><button id="exportButton" class="quiet">Export JSON</button><label class="file-button quiet">Import JSON<input id="importInput" type="file" accept="application/json"></label></div><div id="savedLists" class="saved-lists"></div></section>
+  <section class="panel warning"><h2>Clear room messages</h2><p>Room history cannot be cleared from this tool yet. Clearing the local composer is not the same as deleting messages from the room server. Enable this only after the server's documented clear operation is implemented.</p><button disabled title="Room server clear protocol not configured">Clear room history (unavailable)</button></section>
+  <footer>MeshCore room-server node posts are private authenticated messages. Newlines are retained in the text payload. Room-server history clearing is not provided by the documented protocol.</footer>
+</main><script type="module" src="app.js"></script>
+</body></html>
