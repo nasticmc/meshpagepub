@@ -1,7 +1,22 @@
-import { WebBleConnection, WebSerialConnection, Constants } from '@liamcottle/meshcore.js';
+import WebBleConnection from '@liamcottle/meshcore.js/src/connection/web_ble_connection.js';
+import WebSerialConnection from '@liamcottle/meshcore.js/src/connection/web_serial_connection.js';
+import Constants from '@liamcottle/meshcore.js/src/constants.js';
+
+export const MAX_POST_BYTES = 151;
+const encoder = new TextEncoder();
+export function validateMessage(text, limit = MAX_POST_BYTES) {
+  const bytes = encoder.encode(String(text)).length;
+  return {bytes, limit, valid: bytes <= limit, remaining: limit - bytes};
+}
+export function reorderMessages(messages, from, to) {
+  if (from < 0 || from >= messages.length || to < 0 || to >= messages.length) return [...messages];
+  const next = [...messages], [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
 
 export function splitMessages(values) {
-  return values.map(value => String(value).trim()).filter(Boolean);
+  return values.map(value => String(value)).filter(value => value.trim());
 }
 
 export function normalizeRoomTarget(target) {
@@ -66,6 +81,8 @@ export class MeshCorePublisher {
   async sendMessage(publicKey, text) {
     const key = normalizeRoomTarget({kind:'room-server',publicKey});
     if (typeof text !== 'string' || !text.trim()) throw new Error('Message cannot be empty.');
+    const size = validateMessage(text);
+    if (!size.valid) throw new Error(`Message exceeds the room-server limit of ${size.limit} UTF-8 bytes (${size.bytes} bytes).`);
     return this.connection.sendTextMessage(key, text);
   }
   async close() { return this.connection.close(); }

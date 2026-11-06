@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { splitMessages, sendInOrder, normalizeRoomTarget } from './publisher.js';
+import { splitMessages, sendInOrder, normalizeRoomTarget, validateMessage, reorderMessages } from './publisher.js';
 
 test('split messages retains newline characters verbatim', () => {
-  assert.deepEqual(splitMessages(['first\nsecond', ' third ', '']), ['first\nsecond', 'third']);
+  assert.deepEqual(splitMessages(['first\nsecond', ' third ', '']), ['first\nsecond', ' third ']);
 });
 test('room-server public key validates and converts to 32 bytes', () => {
   const key='0123456789abcdef'.repeat(4);
@@ -23,6 +23,16 @@ test('filters radio contacts to advertised room-server nodes', async () => {
   assert.equal(servers[0].publicKeyHex,'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
 });
 
+test('enforces the 151-byte room-server limit in UTF-8 bytes', () => {
+  assert.equal(validateMessage('a'.repeat(151)).bytes,151);
+  assert.equal(validateMessage('a'.repeat(152)).valid,false);
+  assert.equal(validateMessage('é'.repeat(76)).bytes,152);
+  assert.equal(validateMessage('line 1\nline 2').valid,true);
+});
+test('reorders messages without losing text', () => {
+  assert.deepEqual(reorderMessages(['first','second','third'],0,2),['second','third','first']);
+  assert.deepEqual(reorderMessages(['first','second'],1,1),['first','second']);
+});
 test('publishes each item sequentially and waits between sends', async () => {
   const events=[];
   await sendInOrder(['a','b','c'], async m=>events.push(`send:${m}`), async ms=>events.push(`wait:${ms}`), 700);

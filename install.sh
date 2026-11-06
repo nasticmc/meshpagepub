@@ -17,6 +17,7 @@ if [[ ! -f package-lock.json ]]; then
 fi
 printf 'Installing locked dependencies…\n'
 npm ci --no-audit --no-fund
+npm run build
 
 # Install a lightweight Chromium browser when one is not already available.
 if ! command -v chromium >/dev/null 2>&1 && ! command -v chromium-browser >/dev/null 2>&1 && ! command -v google-chrome >/dev/null 2>&1; then
