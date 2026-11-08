@@ -5,14 +5,20 @@ import path from 'node:path';
 import os from 'node:os';
 import {fileURLToPath} from 'node:url';
 
+import {createTcpBridge} from './tcp_bridge.js';
+
 const root=path.dirname(fileURLToPath(import.meta.url));
 const args=process.argv.slice(2);
 function option(name,fallback){const i=args.indexOf(name);return i<0?fallback:args[i+1]}
 const HOST=option('--host','0.0.0.0'),PORT=Number(option('--port','8000'));
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml'};
-const server=http.createServer((req,res)=>{
+const tcpBridge=createTcpBridge();
+const server=http.createServer(async(req,res)=>{
+  let parsed;
+  try{parsed=new URL(req.url,'http://localhost')}catch{res.writeHead(400);return res.end('Bad request')}
+  if(parsed.pathname.startsWith('/api/tcp/')){await tcpBridge(req,res);return}
   let pathname;
-  try{pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname)}catch{res.writeHead(400);return res.end('Bad request')}
+  try{pathname=decodeURIComponent(parsed.pathname)}catch{res.writeHead(400);return res.end('Bad request')}
   const requested=pathname==='/'?'index.html':pathname.replace(/^\/+/,''),file=path.resolve(root,requested);
   if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end('Forbidden')}
   fs.stat(file,(err,stat)=>{

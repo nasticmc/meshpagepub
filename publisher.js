@@ -8,6 +8,11 @@ export function validateMessage(text, limit = MAX_POST_BYTES) {
   const bytes = encoder.encode(String(text)).length;
   return {bytes, limit, valid: bytes <= limit, remaining: limit - bytes};
 }
+export function secondsToMilliseconds(seconds) {
+  const value = Number(seconds);
+  if (!Number.isInteger(value) || value < 1) throw new Error('Delay must be a whole number of seconds.');
+  return value * 1000;
+}
 export function reorderMessages(messages, from, to) {
   if (from < 0 || from >= messages.length || to < 0 || to >= messages.length) return [...messages];
   const next = [...messages], [item] = next.splice(from, 1);
@@ -86,4 +91,38 @@ export class MeshCorePublisher {
     return this.connection.sendTextMessage(key, text);
   }
   async close() { return this.connection.close(); }
+}
+
+async function tcpRequest(action, payload = {}) {
+  const response = await fetch(`/api/tcp/${action}`, {
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(payload),
+  });
+  let data;
+  try { data = await response.json(); }
+  catch { throw new Error(`TCP bridge returned an invalid response (${response.status}).`); }
+  if (!response.ok) throw new Error(data.error || `TCP bridge request failed (${response.status}).`);
+  return data;
+}
+
+export class TcpCompanionPublisher {
+  constructor(host, port) { this.host=host; this.port=port; this.transport='tcp'; }
+  static async connect(host, port=5000) {
+    const result=await tcpRequest('connect',{host,port});
+    return new TcpCompanionPublisher(result.host,result.port);
+  }
+  async roomServers() {
+    const {contacts=[]}=await tcpRequest('contacts');
+    return contacts.map(contact=>({...contact,publicKey:Uint8Array.from(contact.publicKeyHex.match(/.{2}/g)||[],byte=>parseInt(byte,16))}));
+  }
+  async login(publicKey,password) {
+    const {result}=await tcpRequest('login',{publicKey,password});
+    return result || {permissions:'confirmed'};
+  }
+  async sendMessage(publicKey,text) {
+    const {result}=await tcpRequest('send',{publicKey,text});
+    return result;
+  }
+  async close() { await tcpRequest('disconnect'); }
 }

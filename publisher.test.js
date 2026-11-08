@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { splitMessages, sendInOrder, normalizeRoomTarget, validateMessage, reorderMessages } from './publisher.js';
+import { splitMessages, sendInOrder, normalizeRoomTarget, validateMessage, reorderMessages, secondsToMilliseconds } from './publisher.js';
 
 test('split messages retains newline characters verbatim', () => {
   assert.deepEqual(splitMessages(['first\nsecond', ' third ', '']), ['first\nsecond', ' third ']);
@@ -42,4 +42,11 @@ test('stop signal prevents subsequent sends', async () => {
   const sent=[];
   await assert.rejects(sendInOrder(['a','b'], async m=>{sent.push(m)}, async()=>{}, 400, ()=>sent.length===1), /stopped/);
   assert.deepEqual(sent,['a']);
+});
+
+test('converts whole-second delay values to milliseconds', () => {
+  assert.equal(secondsToMilliseconds(1), 1000);
+  assert.equal(secondsToMilliseconds('3'), 3000);
+  assert.throws(() => secondsToMilliseconds(0), /whole number of seconds/);
+  assert.throws(() => secondsToMilliseconds(1.5), /whole number of seconds/);
 });
