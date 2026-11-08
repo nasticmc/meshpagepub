@@ -16,7 +16,7 @@
     <label class="field">Room password<input id="roomPassword" type="password" maxlength="15" autocomplete="off" placeholder="Room guest/write password"></label>
     <div class="actions"><button id="loginButton" class="secondary" disabled>Log in to room server</button><span id="loginStatus" class="status" aria-live="polite">Connect a radio first.</span></div>
     <div id="messages" class="messages" aria-label="Message list"></div>
-    <div class="actions list-actions"><button id="addButton" class="secondary">+ Add message</button><span class="muted">Drag rows to reorder · 151 bytes maximum per message</span></div>
+    <div class="list-actions"><button id="addButton" class="secondary">+ Add message</button><span class="muted">Use the side controls to reorder or remove messages · 151 bytes maximum per message</span></div>
     <div class="queue-controls"><label class="field delay">Delay between messages (ms)<input id="delayInput" type="number" min="250" step="250" value="1500"></label><div class="actions"><button id="stopButton" class="danger" disabled>Stop queue</button><button id="sendButton" class="primary">Publish sequence</button></div></div>
     <div class="progress-track"><div id="progressBar"></div></div><p id="sendStatus" class="status" aria-live="polite">Ready.</p>
   </section>
