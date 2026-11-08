@@ -68,6 +68,15 @@ ensure_prerequisites() {
   node_is_ready || fail "Prerequisite installation finished, but Node.js 18+ and npm are still unavailable in PATH. Open a new terminal or install them manually, then rerun."
 }
 
+systemd_path_value() {
+  local value="$1"
+  value=${value//\\/\\x5c}
+  value=${value// /\\x20}
+  value=${value//#/\\x23}
+  value=${value//%/%%}
+  printf '%s' "$value"
+}
+
 systemd_quote() {
   local value="$1"
   value=${value//\\/\\\\}
@@ -91,7 +100,7 @@ install_systemd_service() {
   mkdir -p "$unit_dir"
   {
     printf '%s\n' '[Unit]' 'Description=MeshPage Publisher' 'After=network.target' '' '[Service]' 'Type=simple'
-    printf 'WorkingDirectory=%s\n' "$(systemd_quote "$ROOT")"
+    printf 'WorkingDirectory=%s\n' "$(systemd_path_value "$ROOT")"
     printf 'ExecStart=%s %s --host %s --port %s\n' "$(systemd_quote "$node_bin")" "$(systemd_quote "$ROOT/server.js")" "$(systemd_quote "$HOST")" "$(systemd_quote "$PORT")"
     printf '%s\n' 'Restart=on-failure' 'RestartSec=3' 'Environment=NODE_ENV=production' '' '[Install]' 'WantedBy=default.target'
   } > "$unit_file"
