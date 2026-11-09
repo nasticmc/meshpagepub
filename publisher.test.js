@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { splitMessages, sendInOrder, normalizeRoomTarget, validateMessage, reorderMessages, secondsToMilliseconds } from './publisher.js';
+import { splitMessages, sendInOrder, normalizeRoomTarget, validateMessage, reorderMessages, secondsToMilliseconds, insertEmojiAtSelection, buildPreviewMessages, truncateUtf8 } from './publisher.js';
 
 test('split messages retains newline characters verbatim', () => {
   assert.deepEqual(splitMessages(['first\nsecond', ' third ', '']), ['first\nsecond', ' third ']);
@@ -42,6 +42,24 @@ test('stop signal prevents subsequent sends', async () => {
   const sent=[];
   await assert.rejects(sendInOrder(['a','b'], async m=>{sent.push(m)}, async()=>{}, 400, ()=>sent.length===1), /stopped/);
   assert.deepEqual(sent,['a']);
+});
+
+test('truncates text at UTF-8 byte boundaries without splitting emoji code points', () => {
+  assert.equal(truncateUtf8('a'.repeat(147)+'🌲x',151),'a'.repeat(147)+'🌲');
+  assert.equal(truncateUtf8('a'.repeat(150)+'🌲',151),'a'.repeat(150));
+  assert.equal(validateMessage(truncateUtf8('line\n🌲',9)).bytes,9);
+});
+
+test('inserts an emoji at the selected text range and returns the new caret', () => {
+  assert.deepEqual(insertEmojiAtSelection('Hello world',6,11,'🌲'), {value:'Hello 🌲',cursor:8});
+  assert.deepEqual(insertEmojiAtSelection('ok',2,2,'✅'), {value:'ok✅',cursor:3});
+});
+
+test('builds iPhone preview cards in order while preserving newlines and UTF-8 byte counts', () => {
+  assert.deepEqual(buildPreviewMessages(['line 1\nline 2','🌲']), [
+    {number:1,text:'line 1\nline 2',bytes:13},
+    {number:2,text:'🌲',bytes:4},
+  ]);
 });
 
 test('converts whole-second delay values to milliseconds', () => {
