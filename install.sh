@@ -2,6 +2,7 @@
 set -Eeuo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$ROOT/systemd-unit.sh"
 PORT="${MESHPAGEPUB_PORT:-8000}"
 HOST="${MESHPAGEPUB_HOST:-0.0.0.0}"
 MODE="${MESHPAGEPUB_MODE:-service}"
@@ -68,46 +69,35 @@ ensure_prerequisites() {
   node_is_ready || fail "Prerequisite installation finished, but Node.js 18+ and npm are still unavailable in PATH. Open a new terminal or install them manually, then rerun."
 }
 
-systemd_path_value() {
-  local value="$1"
-  value=${value//\\/\\x5c}
-  value=${value// /\\x20}
-  value=${value//#/\\x23}
-  value=${value//%/%%}
-  printf '%s' "$value"
-}
-
-systemd_quote() {
-  local value="$1"
-  value=${value//\\/\\\\}
-  value=${value//\"/\\\"}
-  value=${value//%/%%}
-  value=${value//\$/\$\$}
-  printf '"%s"' "$value"
-}
-
 xml_escape() {
   printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' -e 's/"/\&quot;/g' -e "s/'/\&apos;/g"
 }
 
 install_systemd_service() {
   command -v systemctl >/dev/null 2>&1 || fail "systemd is required for service mode. Use --foreground to run in this terminal."
-  systemctl --user show-environment >/dev/null 2>&1 || fail "The systemd user service manager is unavailable. Log in to a user session or use --foreground."
-  local node_bin unit_dir unit_file
+  local node_bin unit_dir unit_file scope
   node_bin="$(command -v node)"
-  unit_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+  scope="$(meshpagepub_systemd_scope "$EUID")"
+  if [[ "$scope" == system ]]; then
+    unit_dir=/etc/systemd/system
+  else
+    systemctl --user show-environment >/dev/null 2>&1 || fail "The systemd user service manager is unavailable. Log in to a user session or use --foreground."
+    unit_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+  fi
   unit_file="$unit_dir/meshpagepub.service"
   mkdir -p "$unit_dir"
-  {
-    printf '%s\n' '[Unit]' 'Description=MeshPage Publisher' 'After=network.target' '' '[Service]' 'Type=simple'
-    printf 'WorkingDirectory=%s\n' "$(systemd_path_value "$ROOT")"
-    printf 'ExecStart=%s %s --host %s --port %s\n' "$(systemd_quote "$node_bin")" "$(systemd_quote "$ROOT/server.js")" "$(systemd_quote "$HOST")" "$(systemd_quote "$PORT")"
-    printf '%s\n' 'Restart=on-failure' 'RestartSec=3' 'Environment=NODE_ENV=production' '' '[Install]' 'WantedBy=default.target'
-  } > "$unit_file"
-  systemctl --user daemon-reload
-  systemctl --user enable --now meshpagepub.service || fail "Could not start the user service. Check: systemctl --user status meshpagepub.service"
-  info "Installed and started systemd user service."
-  info "Manage it with: systemctl --user status|restart|stop meshpagepub.service"
+  render_meshpagepub_unit "$scope" "$node_bin" "$ROOT" "$HOST" "$PORT" > "$unit_file"
+  if [[ "$scope" == system ]]; then
+    systemctl daemon-reload
+    systemctl enable --now meshpagepub.service || fail "Could not start the system service. Check: systemctl status meshpagepub.service"
+    info "Installed and started system-level systemd service."
+    info "Manage it with: systemctl status|restart|stop meshpagepub.service"
+  else
+    systemctl --user daemon-reload
+    systemctl --user enable --now meshpagepub.service || fail "Could not start the user service. Check: systemctl --user status meshpagepub.service"
+    info "Installed and started systemd user service."
+    info "Manage it with: systemctl --user status|restart|stop meshpagepub.service"
+  fi
 }
 
 install_launch_agent() {

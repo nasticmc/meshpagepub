@@ -4,14 +4,19 @@ Browser publisher for composing and publishing a sequence of posts to a MeshCore
 
 ## Install and launch
 
-The installer checks for **Node.js 18+ and npm**. If they are missing or too old, it attempts to install them using apt (Debian/Ubuntu), dnf (Fedora/RHEL-family), pacman (Arch), or Homebrew (macOS); Linux installation may request administrator access through `sudo`. It then runs `npm ci` and builds the browser bundle. By default, Linux installs and starts a **systemd user service**; macOS installs and starts a **LaunchAgent**. Both restart the server after failure and start on later user logins. Linux requires an available systemd user manager. On Windows, install Node.js 18+ with `winget install OpenJS.NodeJS.LTS` (or from nodejs.org), then use WSL and run `./install.sh --foreground`.
+The installer checks for **Node.js 18+ and npm**. If they are missing or too old, it attempts to install them using apt (Debian/Ubuntu), dnf (Fedora/RHEL-family), pacman (Arch), or Homebrew (macOS); Linux installation may request administrator access through `sudo`. It then runs `npm ci` and builds the browser bundle. By default, Linux installs run as root create a boot-scoped **systemd system service**; non-root Linux installs create a **systemd user service** that starts with that user's login session. macOS installs a **LaunchAgent**. Services restart the server after failure. For an always-on Linux server, install as root so the service remains up across logouts and reboots. On Windows, install Node.js 18+ with `winget install OpenJS.NodeJS.LTS` (or from nodejs.org), then use WSL and run `./install.sh --foreground`.
 
 The machine hosting the server does not need a desktop browser. Open the **Network URL** printed at install time (for example `http://192.168.1.225:8000/`) from another device on the same LAN. Use a Chromium-based browser. **Viewing the page over plain HTTP on a LAN IP is fine, but Web Serial/Bluetooth generally require a secure context (localhost or HTTPS)**; to use a radio attached to the client device remotely, serve the page over HTTPS. If the radio is attached to the host, open `http://localhost:8000/` in a Chromium browser on that host.
 
 To run in the foreground instead of installing a service, use `./install.sh --foreground`. Service management:
 
 ```sh
-# Linux (systemd user service)
+# Linux system service (root installation)
+systemctl status meshpagepub.service
+systemctl restart meshpagepub.service
+systemctl stop meshpagepub.service
+
+# Linux user service (non-root installation)
 systemctl --user status meshpagepub.service
 systemctl --user restart meshpagepub.service
 systemctl --user stop meshpagepub.service
@@ -43,4 +48,4 @@ Posts are MeshCore text messages to the room-server node. The room server may ap
 
 ## Tests
 
-`npm test` exercises newline retention, public-key validation, room-server contact filtering, ordered delay behavior and seconds conversion, UTF-8-safe truncation, emoji insertion, and phone preview message data. No real radio transmission is performed. Hardware and real room-server login/posting require a compatible radio and room credentials.
+`npm test` exercises installer scope/unit generation, newline retention, public-key validation, room-server contact filtering, ordered delay behavior and seconds conversion, UTF-8-safe truncation, emoji insertion, and phone preview message data. No real radio transmission is performed. Hardware and real room-server login/posting require a compatible radio and room credentials.
