@@ -36,11 +36,11 @@ For development, run `npm test` in another terminal. You can also start the app 
 
 1. Connect to the Companion Radio over USB or BLE.
 2. Select a room-server node from the radio's saved contacts (advertised room nodes), or enter its 64-character public key manually. Enter the room password and log in.
-3. Use **Add message**, remove controls, drag-and-drop, or the up/down buttons to arrange the message list. The room-server firmware sets `MAX_POST_TEXT_LEN` to `160 - 9`, so each post is capped at **151 UTF-8 bytes**; the editor shows a live byte count and truncates typed or pasted text at a UTF-8 code-point boundary to prevent oversize posts. Newlines count toward the limit and are preserved.
+3. Use **Add message**, remove controls, drag-and-drop, or the up/down buttons to arrange the message list. The room-server firmware sets `MAX_POST_TEXT_LEN` to `160 - 9`, so each post is capped at **151 UTF-8 bytes**; the editor shows a live byte count and truncates typed or pasted text at a UTF-8 code-point boundary to prevent oversize posts. Newlines count toward the limit and are preserved. Each message editor includes a searchable emoji picker with skin-tone variations; inserted emoji still obey the byte limit. **Preview** opens a generic phone preview at 375 × 667 CSS pixels.
 4. Save/load lists, choose a whole-number delay in seconds, and publish. The queue waits for each radio send command response and applies the selected delay before the next post.
 
 Posts are MeshCore text messages to the room-server node. The room server may apply its own permissions and behavior. Clearing a room is deliberately unavailable: the documented simple room-server client protocol does not provide a history-delete operation; clearing local drafts is not server deletion.
 
 ## Tests
 
-`npm test` exercises newline retention, public-key validation, room-server contact filtering, ordered delay behavior and seconds conversion, UTF-8-safe truncation, emoji insertion, and iPhone preview message data. No real radio transmission is performed. Hardware and real room-server login/posting require a compatible radio and room credentials.
+`npm test` exercises newline retention, public-key validation, room-server contact filtering, ordered delay behavior and seconds conversion, UTF-8-safe truncation, emoji insertion, and phone preview message data. No real radio transmission is performed. Hardware and real room-server login/posting require a compatible radio and room credentials.

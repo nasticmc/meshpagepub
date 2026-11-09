@@ -55,7 +55,7 @@ test('inserts an emoji at the selected text range and returns the new caret', ()
   assert.deepEqual(insertEmojiAtSelection('ok',2,2,'✅'), {value:'ok✅',cursor:3});
 });
 
-test('builds iPhone preview cards in order while preserving newlines and UTF-8 byte counts', () => {
+test('builds phone preview cards in order while preserving newlines and UTF-8 byte counts', () => {
   assert.deepEqual(buildPreviewMessages(['line 1\nline 2','🌲']), [
     {number:1,text:'line 1\nline 2',bytes:13},
     {number:2,text:'🌲',bytes:4},

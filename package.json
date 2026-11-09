@@ -9,7 +9,9 @@
     "start": "npm run build && node server.js"
   },
   "dependencies": {
-    "@liamcottle/meshcore.js": "^1.15.0"
+    "@liamcottle/meshcore.js": "^1.15.0",
+    "emoji-picker-element": "1.29.1",
+    "emoji-picker-element-data": "1.8.0"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"
