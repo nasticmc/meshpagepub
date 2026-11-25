@@ -31,6 +31,16 @@ test('enforces the 130-byte composer allowance in UTF-8 bytes', () => {
   assert.equal(validateMessage('é'.repeat(66)).valid,false);
   assert.equal(validateMessage('line 1\nline 2').valid,true);
 });
+test('splits overflow text into ordered UTF-8-bounded message chunks', () => {
+  const source='a'.repeat(128)+'🌲'+'b'.repeat(5);
+  const chunks=splitMessages([source]);
+  assert.deepEqual(chunks,['a'.repeat(128),'🌲'+'b'.repeat(5)]);
+  assert.equal(chunks.join(''),source);
+  assert.ok(chunks.every(text=>validateMessage(text).valid));
+  assert.deepEqual(splitMessages(['a'.repeat(130)]),['a'.repeat(130)]);
+  assert.deepEqual(splitMessages(['a'.repeat(131)]),['a'.repeat(130),'a']);
+});
+
 test('reorders messages without losing text', () => {
   assert.deepEqual(reorderMessages(['first','second','third'],0,2),['second','third','first']);
   assert.deepEqual(reorderMessages(['first','second'],1,1),['first','second']);

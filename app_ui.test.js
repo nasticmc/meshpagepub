@@ -59,18 +59,23 @@ test('starts compact message fields as single-line and supports touch reordering
   assert.match(css,/\.message-rail\{[^}]*flex-direction:row/);
 });
 
-test('keeps the app editor-only with page save, load, import, and export', () => {
+test('keeps the app editor-only with saved-page list, save, load, import, and export', () => {
   const html=read('index.html'),app=read('app.js');
   assert.match(html,/<h1>MeshPage Editor<\/h1>/);
-  assert.match(html,/id="saveOpenButton"[^>]*>Save page/);
-  assert.match(html,/id="loadOpenButton"[^>]*>Load page/);
+  assert.match(html,/id="saveButton"[^>]*>Save</);
+  assert.match(html,/id="pageName"/);
   assert.match(html,/id="importInput"/);
-  assert.match(html,/id="exportButton"[^>]*>Export all pages/);
+  assert.match(html,/id="savedLists"/);
+  assert.ok(html.indexOf('id="saveButton"')<html.indexOf('id="savedLists"'));
+  assert.ok(html.indexOf('id="importInput"')<html.indexOf('id="savedLists"'));
+  assert.doesNotMatch(html,/saveOpenButton|loadOpenButton|saveDialog|loadDialog|exportButton/);
   assert.doesNotMatch(html,/connectionDialog|Connect USB|Bluetooth UART|roomPassword|Publish sequence|Stop queue|Clear room history/);
   assert.doesNotMatch(app,/MeshCorePublisher|sendInOrder|roomServerSelect|loginButton|sendButton|stopButton/);
   assert.match(read('publisher.js'),/class MeshCorePublisher/,'radio protocol helpers remain isolated for reuse outside this editor');
   assert.match(app,/obj\.pages\|\|obj\.lists\|\|obj/);
-  assert.match(app,/pages:lists\(\)/);
+  assert.match(app,/load\.textContent='Load'/);
+  assert.match(app,/exportButton\.textContent='Export'/);
+  assert.match(app,/exportPage\(name,messages\)/);
   assert.match(html,/theme\.js/);
 });
 
@@ -78,6 +83,15 @@ test('uses a 130-byte UTF-8 allowance for composer messages', () => {
   const html=read('index.html'),publisher=read('publisher.js');
   assert.match(html,/130 bytes maximum per message/);
   assert.match(publisher,/MAX_POST_BYTES = 130/);
+});
+
+test('automatically continues overflowing text in a new message', () => {
+  const app=read('app.js'),publisher=read('publisher.js');
+  assert.match(publisher,/export function splitMessages/);
+  assert.match(app,/function splitOverflowMessage/);
+  assert.match(app,/splitMessages\(\[ta\.value\](?:,MAX_POST_BYTES)?\)/);
+  assert.match(app,/next\.splice\(index,1,\.\.\.chunks\)/);
+  assert.match(app,/continuation\?\.focus/);
 });
 
 test('uses per-message add and remove controls and preserves one editable message', () => {
