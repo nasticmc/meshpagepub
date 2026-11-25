@@ -40,7 +40,7 @@ For development, run `npm test` in another terminal. You can also start the app 
 ## Use
 
 1. Use **Add message** or the per-message **+** control to add messages. Remove controls, the reorder handle, and up/down buttons arrange the page. The handle supports touch/mouse dragging and keyboard arrow keys when focused.
-2. Message fields start on one line and grow with the text. Each message is capped at **151 UTF-8 bytes**; the live byte count and input limit preserve complete Unicode characters. Newlines are retained. Each message editor includes a searchable emoji picker. **Preview** offers compact (360 × 640), standard (390 × 844), and large (430 × 932) phone viewport presets.
+2. Message fields start on one line and grow with the text. Each message is capped at **130 UTF-8 bytes**; the live byte count and input limit preserve complete Unicode characters. Newlines are retained. Each message editor includes a searchable emoji picker. **Preview** offers compact (360 × 640), standard (390 × 844), and large (430 × 932) phone viewport presets.
 3. **Save page** stores the current messages locally. **Load page** lists saved pages. Import or export all pages as JSON from the Load page dialog. Saved pages stay in this browser unless exported.
 
 ## Tests

@@ -2,7 +2,7 @@ import WebBleConnection from '@liamcottle/meshcore.js/src/connection/web_ble_con
 import WebSerialConnection from '@liamcottle/meshcore.js/src/connection/web_serial_connection.js';
 import Constants from '@liamcottle/meshcore.js/src/constants.js';
 
-export const MAX_POST_BYTES = 151;
+export const MAX_POST_BYTES = 130;
 const encoder = new TextEncoder();
 export function validateMessage(text, limit = MAX_POST_BYTES) {
   const bytes = encoder.encode(String(text)).length;

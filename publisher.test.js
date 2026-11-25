@@ -23,10 +23,12 @@ test('filters radio contacts to advertised room-server nodes', async () => {
   assert.equal(servers[0].publicKeyHex,'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
 });
 
-test('enforces the 151-byte room-server limit in UTF-8 bytes', () => {
-  assert.equal(validateMessage('a'.repeat(151)).bytes,151);
-  assert.equal(validateMessage('a'.repeat(152)).valid,false);
-  assert.equal(validateMessage('é'.repeat(76)).bytes,152);
+test('enforces the 130-byte composer allowance in UTF-8 bytes', () => {
+  assert.equal(validateMessage('a'.repeat(130)).bytes,130);
+  assert.equal(validateMessage('a'.repeat(131)).valid,false);
+  assert.equal(validateMessage('é'.repeat(65)).bytes,130);
+  assert.equal(validateMessage('é'.repeat(65)).valid,true);
+  assert.equal(validateMessage('é'.repeat(66)).valid,false);
   assert.equal(validateMessage('line 1\nline 2').valid,true);
 });
 test('reorders messages without losing text', () => {
@@ -45,8 +47,8 @@ test('stop signal prevents subsequent sends', async () => {
 });
 
 test('truncates text at UTF-8 byte boundaries without splitting emoji code points', () => {
-  assert.equal(truncateUtf8('a'.repeat(147)+'🌲x',151),'a'.repeat(147)+'🌲');
-  assert.equal(truncateUtf8('a'.repeat(150)+'🌲',151),'a'.repeat(150));
+  assert.equal(truncateUtf8('a'.repeat(126)+'🌲x',130),'a'.repeat(126)+'🌲');
+  assert.equal(truncateUtf8('a'.repeat(127)+'🌲',130),'a'.repeat(127));
   assert.equal(validateMessage(truncateUtf8('line\n🌲',9)).bytes,9);
 });
 

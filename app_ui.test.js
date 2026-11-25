@@ -74,6 +74,12 @@ test('keeps the app editor-only with page save, load, import, and export', () =>
   assert.match(html,/theme\.js/);
 });
 
+test('uses a 130-byte UTF-8 allowance for composer messages', () => {
+  const html=read('index.html'),publisher=read('publisher.js');
+  assert.match(html,/130 bytes maximum per message/);
+  assert.match(publisher,/MAX_POST_BYTES = 130/);
+});
+
 test('uses per-message add and remove controls and preserves one editable message', () => {
   const app=read('app.js');
   assert.match(app,/makeControl\('add'/);
