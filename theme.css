@@ -1,0 +1,2 @@
+:root[data-theme="light"]{--em-bg:#f3f6f4;--em-panel:#ffffff;--em-panel-soft:#f4f7f5;--em-surface:#ffffff;--em-muted:#66736b;--em-fg:#202b25;--em-fg-muted:#66736b;--em-accent:#267342;--em-border:rgba(32,43,37,.12)}
+:root[data-theme="light"] .phone-screen{color:#17202a}
