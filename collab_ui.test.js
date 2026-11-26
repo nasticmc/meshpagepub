@@ -20,6 +20,16 @@ test('provides a standalone shared-page join composer with temporary presence', 
   assert.match(app,/sharedPageSnapshot/);
 });
 
+test('asks for a shared-page name before creating the share link', () => {
+  const html=read('index.html'),app=read('app.js');
+  assert.match(html,/id="shareSetupDialog"/);
+  assert.match(html,/id="sharedPageName"/);
+  assert.match(html,/id="createShareButton"[^>]*>Create share link</);
+  assert.match(app,/shareSetupDialog/);
+  assert.match(app,/sharedPageName/);
+});
+
+
 test('offers sharing and code join entry points from the local editor', () => {
   const html=read('index.html'),app=read('app.js');
   assert.match(html,/id="shareCurrentButton"[^>]*>Share current page</);
