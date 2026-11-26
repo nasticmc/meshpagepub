@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@liamcottle/meshcore.js": "^1.15.0",
-    "emoji-picker-element": "1.29.1",
-    "emoji-picker-element-data": "1.8.0",
     "ws": "^8.23.0",
     "yjs": "^13.6.33"
   },

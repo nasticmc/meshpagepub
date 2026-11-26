@@ -12,15 +12,11 @@ test('offers a generic phone preview in the editor UI', () => {
   assert.doesNotMatch(`${html}${read('app.js')}${read('style.css')}${read('README.md')}`,/phone\s+6/i);
 });
 
-test('provides a local full emoji picker in each message editor', () => {
+test('does not load an emoji picker in the composer', () => {
   const app=read('app.js'),pkg=JSON.parse(read('package.json'));
-  assert.ok(pkg.dependencies['emoji-picker-element']);
-  assert.match(app,/import ['"]emoji-picker-element['"]/);
-  assert.match(app,/document.createElement\(['"]emoji-picker['"]\)/);
-  assert.match(app,/emoji-click/);
-  assert.match(app,/\/assets\/emoji-data\.json/);
-  const data=JSON.parse(read('assets/emoji-data.json'));
-  assert.ok(data.length>1500,'picker data should contain the full standard emoji set');
+  assert.equal(pkg.dependencies['emoji-picker-element'],undefined);
+  assert.equal(pkg.dependencies['emoji-picker-element-data'],undefined);
+  assert.doesNotMatch(app,/emoji-picker|emoji-click|emojiButton|insertEmojiAtSelection/);
 });
 
 test('removes the TCP bridge and its controls from the standard web app', () => {
@@ -83,6 +79,7 @@ test('uses a 130-byte UTF-8 allowance for composer messages', () => {
   const html=read('index.html'),publisher=read('publisher.js');
   assert.match(html,/130 bytes maximum per message/);
   assert.match(publisher,/MAX_POST_BYTES = 130/);
+  assert.match(read('app.js'),/toolbarActions\.append\(count\)/);
 });
 
 test('automatically continues overflowing text in a new message', () => {
