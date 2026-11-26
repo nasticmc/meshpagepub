@@ -46,6 +46,19 @@ MESHPAGEPUB_DATA_DIR=/var/lib/meshpagepub node server.js --host 127.0.0.1 --port
 ```
 
 Protect and back up that directory separately from the application files. Do not delete or replace `collaboration-secret` while shared pages are active, or existing share codes will no longer resolve. Before public exposure, configure the reverse proxy for HTTPS and WebSocket upgrades.
+
+### Docker Compose deployment
+
+The included Compose stack runs MeshPage on its own Node 22 runtime, so it does not depend on the host's Node version. It stores collaboration state in the named `meshpagepub-state` volume.
+
+```sh
+docker compose up -d --build
+docker compose ps
+docker compose logs -f meshpagepub
+```
+
+The stack publishes port `8000` on all interfaces for the existing reverse proxy. Back up the `meshpagepub-state` volume before replacing the stack or performing any destructive Docker cleanup; it contains both `shared-pages.sqlite` and `collaboration-secret`.
+
 For development, run `npm test` in another terminal. You can also start the app without reinstalling dependencies using `npm start`.
 
 ## Use

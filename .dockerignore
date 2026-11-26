@@ -1,0 +1,10 @@
+.git
+node_modules
+npm-debug.log*
+*.sqlite
+*.sqlite-*
+collaboration-secret
+.DS_Store
+.env
+.env.*
+coverage
