@@ -35,6 +35,17 @@ MESHPAGEPUB_PORT=8080 MESHPAGEPUB_HOST=0.0.0.0 ./install.sh
 
 `0.0.0.0` exposes the editor to reachable interfaces. Restrict access with your host firewall and trusted Wi-Fi. To keep it local only, set `MESHPAGEPUB_HOST=127.0.0.1`.
 
+### Collaboration service configuration
+
+Collaboration is enabled automatically. On first start, MeshPage creates a cryptographically random collaboration secret in `collaboration-secret` inside its state directory and reuses it across restarts. Shared-page state is stored in `shared-pages.sqlite` in the same directory.
+
+By default, the state directory is `$XDG_STATE_HOME/meshpagepub` or `~/.local/state/meshpagepub`. Set `MESHPAGEPUB_DATA_DIR` to use a dedicated persistent location:
+
+```sh
+MESHPAGEPUB_DATA_DIR=/var/lib/meshpagepub node server.js --host 127.0.0.1 --port 8000
+```
+
+Protect and back up that directory separately from the application files. Do not delete or replace `collaboration-secret` while shared pages are active, or existing share codes will no longer resolve. Before public exposure, configure the reverse proxy for HTTPS and WebSocket upgrades.
 For development, run `npm test` in another terminal. You can also start the app without reinstalling dependencies using `npm start`.
 
 ## Use

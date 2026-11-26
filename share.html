@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MeshPage Shared Page</title><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+<main class="shell">
+  <header class="masthead"><a class="brand-logo-link" href="https://eastmesh.au" target="_blank" rel="noopener"><img class="brand-logo" src="/assets/logo.png" alt="EastMesh"></a><div class="brand-title"><a class="brand-link" href="/">MeshPage Editor</a><h1>Shared page</h1></div><span class="editor-mark" aria-hidden="true">LIVE EDITING</span></header>
+  <nav class="towncrier-tabs" aria-label="Shared page sections"><a class="active" href="#sharedComposer">Shared composer</a><a href="/">Local pages</a><button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light mode">☀ Light mode</button></nav>
+  <section id="joinPanel" class="panel join-panel"><p class="eyebrow">COLLABORATION</p><h2>Join shared page</h2><p id="joinDescription" class="muted">Choose the name collaborators will see while you edit.</p><label class="field">Your temporary name<input id="displayName" maxlength="32" autocomplete="nickname" placeholder="e.g. Alex"></label><button id="joinButton" class="primary" type="button">Join shared page</button><p id="joinStatus" class="status" aria-live="polite"></p></section>
+  <section id="sharedComposer" class="panel composer-panel shared-composer" hidden><div class="section-title"><div><p class="eyebrow">SHARED PAGE</p><h2><input id="sharedTitle" aria-label="Shared page title" placeholder="Untitled shared page"></h2><p id="sharedExpiry" class="muted"></p></div><div class="shared-meta"><span id="connectionStatus" class="status">Connecting…</span><div id="collaborators" class="collaborators" aria-live="polite"></div></div></div>
+    <div id="sharedMessages" class="messages" aria-label="Shared message list"></div>
+    <div class="list-actions"><button id="sharedAddButton" class="secondary" type="button">+ Add message</button><button id="copyShareButton" class="quiet" type="button">Copy share link</button><button id="saveLocalCopyButton" class="quiet" type="button">Save local copy</button><button id="leaveSharedButton" class="quiet" type="button">Leave</button><span class="muted">130 bytes maximum per message · text continues into the next message</span></div>
+    <p id="sharedStatus" class="status" aria-live="polite"></p>
+  </section>
+  <footer>Anyone with this link can edit until the shared page expires seven days after its last content change.</footer>
+</main>
+<script defer src="/theme.js"></script><script type="module" src="/collab.bundle.js"></script>
+</body></html>

@@ -4,14 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "esbuild app.js --bundle --format=esm --outfile=app.bundle.js",
+    "build": "esbuild app.js --bundle --format=esm --outfile=app.bundle.js && esbuild collab-app.js --bundle --format=esm --outfile=collab.bundle.js",
     "test": "node --test",
     "start": "npm run build && node server.js"
   },
   "dependencies": {
     "@liamcottle/meshcore.js": "^1.15.0",
     "emoji-picker-element": "1.29.1",
-    "emoji-picker-element-data": "1.8.0"
+    "emoji-picker-element-data": "1.8.0",
+    "ws": "^8.23.0",
+    "yjs": "^13.6.33"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"
